@@ -50,6 +50,19 @@ yargs.command({
             color: argv.color,
         };
         client.write(JSON.stringify(request) + '\n');
+        let wholeData = '';
+        client.on('data', (dataChunk) => {
+          wholeData += dataChunk;
+        });
+        client.on('end', () => {
+          const message = JSON.parse(wholeData);
+          if(message.success) {
+            console.log(chalk.green("Note created successfully"));
+          } else {
+            console.log(chalk.red("This note already exists"));
+          }
+          client.emit('complete', wholeData);
+        });
     } else {
       console.log(chalk.bgRed("Argument missing"));
     }
@@ -79,6 +92,19 @@ yargs.command({
             title: argv.title,
         };
         client.write(JSON.stringify(request) + '\n');
+        let wholeData = '';
+        client.on('data', (dataChunk) => {
+          wholeData += dataChunk;
+        });
+        client.on('end', () => {
+          const message = JSON.parse(wholeData);
+          if(message.success) {
+            console.log(chalk.green("Note deleted successfully"));
+          } else {
+            console.log(chalk.red('This note doesn\'t exist!'));
+          }
+          client.emit('complete', wholeData);
+        });
     } else {
       console.log(chalk.bgRed("Argument missing"));
     }
@@ -190,6 +216,20 @@ yargs.command({
       } else {
         console.log(chalk.bgRed("Not changing anything..."));
       }
+
+        let wholeData = '';
+        client.on('data', (dataChunk) => {
+          wholeData += dataChunk;
+        });
+        client.on('end', () => {
+          const message = JSON.parse(wholeData);
+          if(message.success) {
+            console.log(chalk.green("Note modified successfully"));
+          } else {
+            console.log(chalk.red('This note doesn\'t exist!'));
+          }
+          client.emit('complete', wholeData);
+        });
     } else {
       console.log(chalk.bgRed("Argument missing"));
     }
@@ -213,6 +253,16 @@ yargs.command({
             type: 'list',
         };
         client.write(JSON.stringify(request) + '\n');
+        let wholeData = '';
+        client.on('data', (dataChunk) => {
+          wholeData += dataChunk;
+        });
+        client.on('end', () => {
+          const message = JSON.parse(wholeData);
+          console.log(chalk.magenta.underline("\nCurrent filenames:"));
+          console.log(message.list.toString(', '));
+          client.emit('complete', wholeData);
+        });
     } else {
       console.log(chalk.bgRed("Argument missing"));
     }
@@ -242,6 +292,35 @@ yargs.command({
             title: argv.title,
         };
         client.write(JSON.stringify(request) + '\n');
+        let wholeData = '';
+        client.on('data', (dataChunk) => {
+          wholeData += dataChunk;
+        });
+        client.on('end', () => {
+          const message = JSON.parse(wholeData);
+          if(message.success) {
+            let dummy = JSON.parse(message.notes);
+            switch (dummy.color) {
+              case 'red':
+                console.log(chalk.red(dummy.title + '\n' + dummy.body));
+              break;
+              case 'blue':
+                console.log(chalk.blue(dummy.title + '\n' + dummy.body));
+              break;
+              case 'green':
+                console.log(chalk.green(dummy.title + '\n' + dummy.body));
+              break;
+              case 'yellow':
+                console.log(chalk.yellow(dummy.title + '\n' + dummy.body));
+              break;
+              default:
+                break;
+            }
+          } else {
+            console.log(chalk.red('This note doesn\'t exist!'));
+          }
+          client.emit('complete', wholeData);
+        });
     } else {
       console.log(chalk.bgRed("Argument missing"));
     }

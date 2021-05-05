@@ -1,7 +1,7 @@
 import {intManager} from "./intManager";
 import {Notes} from "./notes";
 import * as fs from 'fs';
-import * as chalk from 'chalk';
+// import * as chalk from 'chalk';
 
 /**
  * Class that represents a note manager
@@ -19,14 +19,14 @@ export class Manager implements intManager {
      * @param color Color of the note
      * @param user User name
      */
-    add(title: string, body: string, color: string, user: string): void {
+    add(title: string, body: string, color: string, user: string): string {
       let note: Notes = new Notes(title, body, color);
       if(fs.existsSync(`./${user}`) == false) fs.mkdirSync(`./${user}`);
       if(fs.existsSync(`./${user}/${title}.json`) == false) {
         fs.writeFileSync(`./${user}/${title}.json`, note.toJSON());
-        console.log(chalk.green('Note successfully created!'));
+        return 'Note successfully created!';
       } else {
-        console.log(chalk.red('This note already exists!'));
+        return 'This note already exists!';
       }
     }
 
@@ -35,12 +35,12 @@ export class Manager implements intManager {
      * @param user User name
      * @param title Title of the note
      */
-    remove(user: string, title: string): void {
+    remove(user: string, title: string): string {
       if(fs.existsSync(`./${user}/${title}.json`) == true) {
         fs.rmSync(`./${user}/${title}.json`);
-        console.log(chalk.green('Note successfully deleted!'));
+        return 'Note successfully deleted!';
       } else {
-        console.log(chalk.red('This note doesn\'t exist!'));
+        return 'This note doesn\'t exist!';
       }
     }
 
@@ -52,7 +52,7 @@ export class Manager implements intManager {
      * @param newBody New body of the note
      * @param newColor New color of the note
      */
-    modify(user: string, title: string, newTitle: string, newBody: string, newColor: string): void {
+    modify(user: string, title: string, newTitle: string, newBody: string, newColor: string): string {
       if(fs.existsSync(`./${user}/${title}.json`) == true) {
         let buffer = fs.readFileSync(`./${user}/${title}.json`);
         let obj = JSON.parse(buffer.toString());
@@ -61,9 +61,9 @@ export class Manager implements intManager {
         if(newBody !== '') note.setBody(newBody);
         if(newColor !== '') note.setColor(newColor);
         fs.writeFileSync(`./${user}/${title}.json`, note.toJSON());
-        console.log(chalk.green('Note successfully modified!'));
+        return 'Note successfully modified!';
       } else {
-          console.log(chalk.red('This note doesn\'t exist!'));
+        return 'This note doesn\'t exist!';
       }
     }
 
@@ -73,28 +73,8 @@ export class Manager implements intManager {
      */
     list(user: string): string[] {
       let list: string[] = [];
-      console.log(chalk.magenta.underline("\nCurrent filenames:"));
       fs.readdirSync(`./${user}`).forEach((file) => {
           list.push(file);
-          let buffer = fs.readFileSync(`./${user}/${file}`);
-          let obj = JSON.parse(buffer.toString());
-          switch (obj.color) {
-            case 'yellow':
-              console.log(chalk.yellow(file));
-            break;
-            case 'red':
-              console.log(chalk.red(file));
-            break;
-            case 'blue':
-              console.log(chalk.blue(file));
-            break;
-            case 'green':
-              console.log(chalk.green(file));
-            break;
-            default:
-              console.log(chalk.red('Color not available'));
-              break;
-          }
       });
       return list;
     }
@@ -104,29 +84,14 @@ export class Manager implements intManager {
      * @param user User name
      * @param title Title of the note
      */
-    read(user: string, title: string): void {
+    read(user: string, title: string): Notes {
       if(fs.existsSync(`./${user}/${title}.json`) == true) {
           let buffer = fs.readFileSync(`./${user}/${title}.json`);
           let obj = JSON.parse(buffer.toString());
-          switch (obj.color) {
-            case 'yellow':
-              console.log(chalk.yellow(`${obj.title}\n${obj.body}`));
-            break;
-            case 'red':
-              console.log(chalk.red(`${obj.title}\n${obj.body}`));
-            break;
-            case 'blue':
-              console.log(chalk.blue(`${obj.title}\n${obj.body}`));
-            break;
-            case 'green':
-              console.log(chalk.green(`${obj.title}\n${obj.body}`));
-            break;
-            default:
-              console.log(chalk.red('Color not available'));
-              break;
-          }
+          let newNote = new Notes(obj.title, obj.body, obj.color);
+          return newNote;
       } else {
-          console.log(chalk.red('This note doesn\'t exist!'));
+          return new Notes('', '', '');
       }
     }
 }
