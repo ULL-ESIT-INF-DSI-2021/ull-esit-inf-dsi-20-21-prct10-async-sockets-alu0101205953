@@ -4,6 +4,7 @@ import * as net from 'net';
 
 const client = net.connect({port: 60300});
 
+/** The request type. It contains the type of operation, and some additional parameters such as user, title of the note, etc. that are usefull dependin on the operation we want to do */
 export type RequestType = {
     type: 'add' | 'modify' | 'remove' | 'read' | 'list';
     user?: string;
@@ -15,6 +16,7 @@ export type RequestType = {
     newColor?: string;
 }
 
+/** Command that allows to add a note */
 yargs.command({
   command: 'add',
   describe: 'Add a new note',
@@ -69,6 +71,7 @@ yargs.command({
   },
 });
 
+/** Command that allows to remove a note */
 yargs.command({
   command: 'remove',
   describe: 'Delete a note',
@@ -111,6 +114,7 @@ yargs.command({
   },
 });
 
+/** Command that allows to modify a note */
 yargs.command({
   command: 'modify',
   describe: 'Modify a note',
@@ -236,6 +240,7 @@ yargs.command({
   },
 });
 
+/** Command that allows the content of a specified user's directory */
 yargs.command({
   command: 'list',
   describe: 'List every note title',
@@ -269,6 +274,7 @@ yargs.command({
   },
 });
 
+/** Command that allows to read a specified note */
 yargs.command({
   command: 'read',
   describe: 'Read a note',

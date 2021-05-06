@@ -13,7 +13,7 @@ describe('Manager tests', () =>{
     });
     it('Si la nota ya existe se muestra un mensaje de error', () =>{
       noteManager.add("helloworld", "HELLO WORLD!", "blue", "user");
-      expect(noteManager.add("helloworld", "HELLO WORLD2!", "green", "user")).to.be.undefined;
+      expect(noteManager.add("helloworld", "HELLO WORLD2!", "green", "user")).to.be.equal('This note already exists!');
       noteManager.remove("user", "helloworld");
     });
     it('Se debe poder eliminar una nota', () =>{
@@ -22,7 +22,7 @@ describe('Manager tests', () =>{
       expect(fs.existsSync("./user/helloworld.json")).to.be.false;
     });
     it('Si la nota no existe se muestra un mensaje de error', () =>{
-      expect(noteManager.remove("user", "helloworld")).to.be.undefined;
+      expect(noteManager.remove("user", "helloworld")).to.be.equal('This note doesn\'t exist!');
     });
     it('Se debe poder modificar una nota', () =>{
       noteManager.add("helloworld", "HELLO WORLD!", "blue", "user");
@@ -33,7 +33,7 @@ describe('Manager tests', () =>{
       noteManager.remove("user", "helloworld");
     });
     it('Si la nota no existe se muestra un mensaje de error', () =>{
-        expect(noteManager.modify("user", "helloworld", '', "HELLO WORLD!", '')).to.be.undefined;
+        expect(noteManager.modify("user", "helloworld", '', "HELLO WORLD!", '')).to.be.equal('This note doesn\'t exist!');
       });
     it('Se debe poder leer una nota', () =>{
       noteManager.add("helloworld", "HELLO WORLD!", "blue", "user");
@@ -41,12 +41,12 @@ describe('Manager tests', () =>{
       noteManager.add("helloworld3", "HELLO WORLD!", "red", "user");
       noteManager.add("helloworld4", "HELLO WORLD!", "green", "user");
       noteManager.add("helloworld5", "HELLO WORLD!", "cyan", "user");
-      expect(noteManager.read("user", "helloworld")).to.be.undefined;
-      expect(noteManager.read("user", "helloworld2")).to.be.undefined;
-      expect(noteManager.read("user", "helloworld3")).to.be.undefined;
-      expect(noteManager.read("user", "helloworld4")).to.be.undefined;
-      expect(noteManager.read("user", "helloworld5")).to.be.undefined;
-      expect(noteManager.read("user", "helloworld6")).to.be.undefined;
+      expect(noteManager.read("user", "helloworld").title).to.be.equal('helloworld');
+      expect(noteManager.read("user", "helloworld2").title).to.be.equal('helloworld2');
+      expect(noteManager.read("user", "helloworld3").title).to.be.equal('helloworld3');
+      expect(noteManager.read("user", "helloworld4").title).to.be.equal('helloworld4');
+      expect(noteManager.read("user", "helloworld5").title).to.be.equal('helloworld5');
+      expect(noteManager.read("user", "helloworld6").title).to.be.equal('');
       noteManager.remove("user", "helloworld");
       noteManager.remove("user", "helloworld2");
       noteManager.remove("user", "helloworld3");

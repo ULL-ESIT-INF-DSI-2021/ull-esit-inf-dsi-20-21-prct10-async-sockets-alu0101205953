@@ -4,6 +4,7 @@ import {Notes} from "./notes";
 
 let noteManager = new Manager();
 
+/** The respnse type. It contains the type of operation, a varieble that indicates if it was successfull or not and some additional parameters */
 export type ResponseType = {
     type: 'add' | 'modify' | 'remove' | 'read' | 'list';
     success: boolean;
@@ -11,6 +12,7 @@ export type ResponseType = {
     list?: string[];
   }
 
+  /** Server that allows clients to connect and manages the note application */
 export let server = net.createServer((connection) => {
     console.log('A client has connected.');
 
@@ -40,6 +42,7 @@ export let server = net.createServer((connection) => {
                     };
                     connection.write(JSON.stringify(response) + '\n');
                     connection.end();
+                    server.emit('noteAdded', 'Created');
                 } else {
                     let response: ResponseType = {
                         type: 'add',
@@ -47,6 +50,7 @@ export let server = net.createServer((connection) => {
                     };
                     connection.write(JSON.stringify(response) + '\n');
                     connection.end();
+                    server.emit('noteAdded', 'Not created');
                 }
             break;
             case 'remove':
@@ -111,6 +115,12 @@ export let server = net.createServer((connection) => {
     });
 });
 
-/* server.listen(60300, () => {
-    console.log('Waiting for clients to connect.');
-}); */
+if(process.argv.length == 3) {
+    if(!isNaN(Number(process.argv[2]))) {
+        server.listen(Number(process.argv[2]), () => {
+            console.log('Waiting for clients to connect.');
+        });
+    }
+} else {
+    console.log('You must introduce a valid port');
+}

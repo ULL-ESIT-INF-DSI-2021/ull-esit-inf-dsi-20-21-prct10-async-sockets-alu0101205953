@@ -1,7 +1,6 @@
 import {intManager} from "./intManager";
 import {Notes} from "./notes";
 import * as fs from 'fs';
-// import * as chalk from 'chalk';
 
 /**
  * Class that represents a note manager
