@@ -3,7 +3,9 @@
         "./src/intManager.ts",
         "./src/intNotes.ts",
         "./src/notes.ts",
-        "./src/manager.ts"
+        "./src/manager.ts",
+        "./src/server.ts",
+        "./src/client.ts"
       ],
     "out": "./docs"
 }
