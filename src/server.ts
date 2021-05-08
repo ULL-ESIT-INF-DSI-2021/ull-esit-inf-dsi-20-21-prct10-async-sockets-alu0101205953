@@ -12,7 +12,8 @@ export type ResponseType = {
     list?: string[];
   }
 
-  /** Server that allows clients to connect and manages the note application */
+
+/** Server that allows clients to connect and manages the note application */
 export let server = net.createServer((connection) => {
     console.log('A client has connected.');
 
@@ -40,6 +41,7 @@ export let server = net.createServer((connection) => {
                         type: 'add',
                         success: true,
                     };
+                    console.log('add received');
                     connection.write(JSON.stringify(response) + '\n');
                     connection.end();
                     server.emit('noteAdded', 'Created');
@@ -50,7 +52,7 @@ export let server = net.createServer((connection) => {
                     };
                     connection.write(JSON.stringify(response) + '\n');
                     connection.end();
-                    server.emit('noteAdded', 'Not created');
+                    server.emit('noteNotAdded', 'Not created');
                 }
             break;
             case 'remove':
@@ -61,6 +63,7 @@ export let server = net.createServer((connection) => {
                     };
                     connection.write(JSON.stringify(response) + '\n');
                     connection.end();
+                    server.emit('noteDeleted', 'Deleted');
                 } else {
                     let response: ResponseType = {
                         type: 'remove',
@@ -68,6 +71,7 @@ export let server = net.createServer((connection) => {
                     };
                     connection.write(JSON.stringify(response) + '\n');
                     connection.end();
+                    server.emit('noteNotDeleted', 'Not deleted');
                 }
             break;
             case 'modify':
