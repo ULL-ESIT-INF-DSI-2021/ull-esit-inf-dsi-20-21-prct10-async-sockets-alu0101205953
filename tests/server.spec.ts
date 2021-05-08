@@ -1,71 +1,111 @@
 import "mocha";
 import {expect} from "chai";
 import * as net from 'net';
-import {server} from '../src/server';
-import {EventEmitter} from "events";
-import {emit} from "process";
-
-server.listen(60301, () => {
-    console.log('Waiting for clients to connect.');
-});
-// const socket = net.connect({port: 60301});
-let emitter = new EventEmitter();
-emitter.emit('test1', '');
+import {Server} from '../src/server';
 
 describe('Server Tests', () => {
-    /* it('Should emit a message event once it gets a complete message', (done) => {
-        server.on('request', (data) => {
-            expect(data).not.to.be.undefined;
-            done();
-        });
-    });*/
-    it('Can add a note if it doesn\'t exist', (done) => {
-        server.on('noteAdded', (data) => {
+    it('A note can be added if it doesn\'t exist', (done) => {
+        let socket = net.connect(60301);
+        let server1 = new Server;
+        server1.connection(60301);
+        server1.on('noteAdded', (data) => {
             expect(data).to.be.equal('Created');
-            // server.close();
-            emitter.emit('test2', '');
             done();
         });
-        emitter.on('test1', () => {
-            const socket = net.connect({port: 60301});
-            console.log('huuulaaa');
-            socket.write('{\"user\": \"test\", \"type\": \"add\", \"title\": \"test note\", \"body\": \"aaaaaaaaaaaaaa\", \"color\": \"red\"}\n');
+        socket.write("{\"type\": \"add\", \"title\": \"note1\", \"body\": \"aaaaaa\", \"color\": \"red\", \"user\": \"test\"}\n");
+        socket.on('data', () => {
+            server1.server.close();
         });
-        // socket.end();
     });
-    it('Can\'t add a note if it exists', (done) => {
-        server.on('noteNotAdded', (data) => {
+    it('A note can\'t be added if it exists', (done) => {
+        let socket = net.connect(60302);
+        let server1 = new Server;
+        server1.connection(60302);
+        server1.on('noteNotAdded', (data) => {
             expect(data).to.be.equal('Not created');
-            // server.close();
-            emitter.emit('close', '');
             done();
         });
-        emitter.on('test2', () => {
-            const socket = net.connect({port: 60301});
-            socket.write('{\"user\": \"test\", \"type\": \"add\", \"title\": \"test note\", \"body\": \"aaaaaaaaaaaaaa\", \"color\": \"red\"}\n');
+        socket.write("{\"type\": \"add\", \"title\": \"note1\", \"body\": \"aaaaaa\", \"color\": \"red\", \"user\": \"test\"}\n");
+        socket.on('data', () => {
+            server1.server.close();
         });
-        emitter.on('close', () => {
-            server.close();
-        });
-        // socket.end();
     });
-    /* it('Can delete a note if it exists', (done) => {
-        server.on('noteDeleted', (data) => {
-            expect(data).to.be.equal('Deleted');
-            // server.close();
+    it('A note can be modified if it exists', (done) => {
+        let socket = net.connect(60303);
+        let server1 = new Server;
+        server1.connection(60303);
+        server1.on('noteModified', (data) => {
+            expect(data).to.be.equal('Modified');
             done();
         });
-
-        socket.write('{\"user\": \"test\", \"type\": \"remove\", \"title\": \"test note\"}\n');
-        // socket.end();
+        socket.write("{\"type\": \"modify\", \"user\": \"test\", \"title\": \"note1\", \"newGody\": \"aaaaaaaaa\"}\n");
+        socket.on('data', () => {
+            server1.server.close();
+        });
     });
-    it('Can\'t delete a note if it doesn\'t exist', (done) => {
-        server.on('noteNotDeleted', (data) => {
+    it('A note can\'t be modified if it doesn\'t exist', (done) => {
+        let socket = net.connect(60304);
+        let server1 = new Server;
+        server1.connection(60304);
+        server1.on('noteNotModified', (data) => {
+            expect(data).to.be.equal('Not modified');
+            done();
+        });
+        socket.write("{\"type\": \"modify\", \"user\": \"test\", \"title\": \"note2\", \"newGody\": \"aaaaaaaaa\"}\n");
+        socket.on('data', () => {
+            server1.server.close();
+        });
+    });
+    it('A directory can be listed if it exists', (done) => {
+        let socket = net.connect(60305);
+        let server1 = new Server;
+        server1.connection(60305);
+        server1.on('dirListed', (data) => {
+            expect(data).to.be.equal('Listed');
+            done();
+        });
+        socket.write("{\"type\": \"list\", \"user\": \"test\"}\n");
+        socket.on('data', () => {
+            server1.server.close();
+        });
+    });
+    it('A note can be read if it exists', (done) => {
+        let socket = net.connect(60306);
+        let server1 = new Server;
+        server1.connection(60306);
+        server1.on('noteRead', (data) => {
+            expect(data).to.be.equal('Read');
+            done();
+        });
+        socket.write("{\"type\": \"read\", \"user\": \"test\", \"title\": \"note1\"}\n");
+        socket.on('data', () => {
+            server1.server.close();
+        });
+    });
+    it('A note can\'t be removed if it doesn\'t exist', (done) => {
+        let socket = net.connect(60307);
+        let server1 = new Server;
+        server1.connection(60307);
+        server1.on('noteNotDeleted', (data) => {
             expect(data).to.be.equal('Not deleted');
-            server.close();
             done();
         });
-        socket.write('{\"user\": \"test\", \"type\": \"remove\", \"title\": \"test note\"}\n');
-        socket.end();
-    }); */
-  });
+        socket.write("{\"type\": \"remove\", \"user\": \"test\", \"title\": \"note2\"}\n");
+        socket.on('data', () => {
+            server1.server.close();
+        });
+    });
+    it('A note can be removed if it exists', (done) => {
+        let socket = net.connect(60308);
+        let server1 = new Server;
+        server1.connection(60308);
+        server1.on('noteDeleted', (data) => {
+            expect(data).to.be.equal('Deleted');
+            done();
+        });
+        socket.write("{\"type\": \"remove\", \"user\": \"test\", \"title\": \"note1\"}\n");
+        socket.on('data', () => {
+            server1.server.close();
+        });
+    });
+});
